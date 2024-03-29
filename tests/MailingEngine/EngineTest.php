@@ -297,13 +297,13 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Attachments($ml, 'content with attachments.', 'text/plain', 'unit-test@php.com', 'test subject');
 		$amsh->setAttachmentsCount(1);
-		$this->assertInstanceOf(\Nettools\Mailing\MassMailing\Attachments::class, $amsh->setAttachment($this->_fatt, 'attachment.txt', 'text/plain', 0));	
+		$this->assertInstanceOf(\Nettools\MassMailing\Attachments::class, $amsh->setAttachment($this->_fatt, 'attachment.txt', 'text/plain', 0));	
 
 
 
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Attachments($ml, 'content with attachments.', 'text/plain', 'unit-test@php.com', 'test subject');
-		$this->assertInstanceOf(\Nettools\Mailing\MassMailing\Attachments::class,
+		$this->assertInstanceOf(\Nettools\MassMailing\Attachments::class,
 								
 								$amsh->setAttachments(
 											array(
@@ -390,13 +390,13 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Embeddings($ml, 'content with embeddings.', 'text/plain', 'unit-test@php.com', 'test subject');
 		$amsh->setEmbeddingsCount(1);
-		$this->assertInstanceOf(\Nettools\Mailing\MassMailing\Embeddings::class, $amsh->setEmbedding($this->_fatt, 'text/plain', 'cid-123', 0));	// tester chainage
+		$this->assertInstanceOf(\Nettools\MassMailing\Embeddings::class, $amsh->setEmbedding($this->_fatt, 'text/plain', 'cid-123', 0));	// tester chainage
 
 
 
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Embeddings($ml, 'content with embeddings.', 'text/plain', 'unit-test@php.com', 'test subject');
-		$this->assertInstanceOf(\Nettools\Mailing\MassMailing\Embeddings::class,
+		$this->assertInstanceOf(\Nettools\MassMailing\Embeddings::class,
 								
 								$amsh->setEmbeddings(
 											array(
