@@ -64,6 +64,7 @@ class MailingEngineTest extends \PHPUnit\Framework\TestCase
 		
 		
 		
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
 		$msh = new Engine($ml, 'msh content', 'text/plain', 'unit-test@php.com', 'test subject', 
 										[
 											'template' => 'my template : %content%',
