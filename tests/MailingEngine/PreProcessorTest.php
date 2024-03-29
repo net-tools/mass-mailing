@@ -1,6 +1,6 @@
 <?php 
 
-namespace Nettools\Mailing\MassMailing\Tests;
+namespace Nettools\MassMailing\MailingEngine\Tests;
 
 
 
