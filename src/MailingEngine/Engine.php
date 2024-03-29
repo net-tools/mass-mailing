@@ -8,8 +8,8 @@ namespace Nettools\MassMailing\MailingEngine;
 use \Nettools\Mailing\MailBuilder\Builder;
 use \Nettools\Mailing\MailBuilder\Content;
 use \Nettools\Mailing\Mailer;
-use \Nettools\Mailing\MailSenderQueue\Queue;
-use \Nettools\Mailing\MailSenderQueue\Store;
+use \Nettools\MassMailing\QueueEngine\Queue;
+use \Nettools\MassMailing\QueueEngine\Store;
 
 
 
@@ -107,7 +107,7 @@ class Engine
 	 *
 	 * Optionnal parameters for `$params` are :
 	 *   - template : template string used for email content ; if set, it must include a `%content%` string that will be replaced (call to `render` method) by the actual mail content (arg `$mail`)
-	 *   - queue : If set, a MailSenderQueue name to create and append emails to
+	 *   - queue : If set, a Nettools\MassMailing\QueueEngine\Queue name to create and append emails to
 	 *   - queueParams : If set, parameters of queue subsystem as an associative array with values for keys `root` and `batchCount`
 	 *   - bcc : If set, email BCC address to send a copy to
 	 *   - cc : If set, email CC address to send a copy to
@@ -329,7 +329,7 @@ class Engine
 
 
 		// if sending to a queue
-		if ( is_object($this->queue) && ($this->queue instanceof \Nettools\MassMailing\MailSenderQueue\Queue) )
+		if ( is_object($this->queue) && ($this->queue instanceof Queue) )
 			$this->queue->push($mail, $this->from, $dest, $subject); 
 		else
 			$this->mailer->sendmail($mail, $this->from, $dest, $subject);
@@ -356,7 +356,7 @@ class Engine
 	public function getQueueCount()
 	{
 		// if `msender` property is an object, the queue has already been created and used : at least an email is in there
-		if ( is_object($this->queue) && ($this->queue instanceof \Nettools\MassMailing\MailSenderQueue\Queue) )
+		if ( is_object($this->queue) && ($this->queue instanceof Queue) )
 			return $this->queue->count;
 
 		
