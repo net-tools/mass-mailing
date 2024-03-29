@@ -390,13 +390,13 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Embeddings($ml, 'content with embeddings.', 'text/plain', 'unit-test@php.com', 'test subject');
 		$amsh->setEmbeddingsCount(1);
-		$this->assertInstanceOf(\Nettools\MassMailing\Embeddings::class, $amsh->setEmbedding($this->_fatt, 'text/plain', 'cid-123', 0));	// tester chainage
+		$this->assertInstanceOf(Embeddings::class, $amsh->setEmbedding($this->_fatt, 'text/plain', 'cid-123', 0));	// tester chainage
 
 
 
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Embeddings($ml, 'content with embeddings.', 'text/plain', 'unit-test@php.com', 'test subject');
-		$this->assertInstanceOf(\Nettools\MassMailing\Embeddings::class,
+		$this->assertInstanceOf(Embeddings::class,
 								
 								$amsh->setEmbeddings(
 											array(
