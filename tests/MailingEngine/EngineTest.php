@@ -297,13 +297,13 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Attachments($ml, 'content with attachments.', 'text/plain', 'unit-test@php.com', 'test subject');
 		$amsh->setAttachmentsCount(1);
-		$this->assertInstanceOf(\Nettools\MassMailing\Attachments::class, $amsh->setAttachment($this->_fatt, 'attachment.txt', 'text/plain', 0));	
+		$this->assertInstanceOf(Attachments::class, $amsh->setAttachment($this->_fatt, 'attachment.txt', 'text/plain', 0));	
 
 
 
 		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
 		$amsh = new Attachments($ml, 'content with attachments.', 'text/plain', 'unit-test@php.com', 'test subject');
-		$this->assertInstanceOf(\Nettools\MassMailing\Attachments::class,
+		$this->assertInstanceOf(Attachments::class,
 								
 								$amsh->setAttachments(
 											array(
