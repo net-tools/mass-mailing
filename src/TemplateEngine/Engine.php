@@ -80,7 +80,7 @@ class Engine
 	 * @param string $mailContentType May be 'text/plain' or 'text/html'
 	 * @param string[] $params Associative array with optionnal parameters ; corresponding fluent methods will be called to set parameters
 	 */
-	function __construct($mail, $mailContentType, array $params = [])
+	function __construct($mail, $mailContentType, ?array $params = [])
 	{
 		// paramètres
 		$this->mail = $mail;
@@ -88,9 +88,10 @@ class Engine
 
 		
 		// optionnal parameters
-		foreach ( $params as $k => $v )
-			if ( method_exists($this, "set$k") )
-				call_user_func([$this, "set$k"], $v);
+		if ( is_array($params) )
+			foreach ( $params as $k => $v )
+				if ( method_exists($this, "set$k") )
+					call_user_func([$this, "set$k"], $v);
 	}
 	
 	
