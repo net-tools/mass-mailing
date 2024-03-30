@@ -61,9 +61,11 @@ class Engine
 		{
 			case 'text/plain' : 
 				$mail = Builder::addTextHtmlFromText($mail, $this->template);
+				break;
 				
 			case 'text/html': 
 				$mail = Builder::addTextHtmlFromHtml($mail, $this->template);
+				break;
 				
 			default:
 				throw new \Nettools\MassMailing\TemplateEngine\Exception('Unsupported content-type : ' . $this->mailContentType);
