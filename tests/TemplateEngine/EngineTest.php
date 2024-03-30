@@ -48,15 +48,15 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	{
 		// using template
 		$e = new Engine('To be processed', 'text/plain', [
-															'attachements' => [ Engine::attachment('{content1 of file}', 'text/plain')->asRawContent(),
+															'attachments' => [ 	Engine::attachment('{content1 of file}', 'text/plain')->asRawContent(),
 																			   	Engine::attachment('{content2 of file}', 'text/plain')->asRawContent()->withFileName('MyFile.txt') ]
 														 ]);
 		$mail = $e->build();
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
 		$this->assertEquals(true, $mail->getPart(1) instanceof \Nettools\Mailing\MailBuilder\Attachment);
 		$this->assertEquals(true, $mail->getPart(2) instanceof \Nettools\Mailing\MailBuilder\Attachment);
-		$this->assertStringContainsString("Content-Disposition: attachment;\r\n filename=\"no_name\"", $mail->getPart(1)->getContent());
-		$this->assertStringContainsString("Content-Disposition: attachment;\r\n filename=\"MyFile.txt\"", $mail->getPart(2)->getContent());
+		$this->assertStringContainsString("Content-Disposition: attachment;\r\n filename=\"no_name\"", $mail->getPart(1)->toString());
+		$this->assertStringContainsString("Content-Disposition: attachment;\r\n filename=\"MyFile.txt\"", $mail->getPart(2)->toString());
 		$this->assertStringContainsString(base64_encode('{content1 of file}'), $mail->getPart(1)->getContent());
 		$this->assertStringContainsString(base64_encode('{content2 of file}'), $mail->getPart(2)->getContent());
 	}
@@ -88,8 +88,8 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
 		$this->assertEquals(true, $mail->getPart(1) instanceof \Nettools\Mailing\MailBuilder\Embedding);
 		$this->assertEquals(true, $mail->getPart(2) instanceof \Nettools\Mailing\MailBuilder\Embedding);
-		$this->assertStringContainsString("Content-Disposition: inline;\r\n filename=\"cid1\"", $mail->getPart(1)->getContent());
-		$this->assertStringContainsString("Content-Disposition: inline;\r\n filename=\"cid2\"", $mail->getPart(2)->getContent());
+		$this->assertStringContainsString("Content-Disposition: inline;\r\n filename=\"cid1\"", $mail->getPart(1)->toString());
+		$this->assertStringContainsString("Content-Disposition: inline;\r\n filename=\"cid2\"", $mail->getPart(2)->toString());
 		$this->assertStringContainsString(base64_encode('{content1 of file}'), $mail->getPart(1)->getContent());
 		$this->assertStringContainsString(base64_encode('{content2 of file}'), $mail->getPart(2)->getContent());
 	}
