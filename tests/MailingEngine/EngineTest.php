@@ -76,9 +76,6 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		
 		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
 		$msh = new Engine($ml, 'msh content', 'text/plain', 'unit-test@php.com', 'test subject', ['testMode'=>true]);
-		$this->assertEquals(NULL, $msh->getToOverride());
-		$msh->setToOverride('override-user@php.com');
-		$this->assertEquals('override-user@php.com', $msh->getToOverride());
 		$this->assertEquals(true, $msh->getTestMode());
 		$this->assertEquals('msh content', $msh->getRawMail());
 

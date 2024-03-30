@@ -34,7 +34,6 @@ class Engine
 	protected $cc = NULL;
 	protected $bcc = NULL;
 	protected $replyTo = false;
-	protected $toOverride = NULL;
 	protected $testRecipients = NULL;	
 	protected $preProcessors = [];
 	

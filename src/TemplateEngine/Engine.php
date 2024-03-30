@@ -7,7 +7,8 @@ namespace Nettools\MassMailing\TemplateEngine;
 // clauses use
 use \Nettools\Mailing\MailBuilder\Builder;
 use \Nettools\Mailing\MailBuilder\Content;
-use \Nettools\Mailing\Mailer;
+use \Nettools\Mailing\FluentEngine\Attachment;
+use \Nettools\Mailing\FluentEngine\Embedding;
 
 
 
@@ -24,6 +25,8 @@ class Engine
 	protected $mailContentType = NULL;
 	protected $template = Builder::DEFAULT_TEMPLATE;
 	protected $preProcessors = [];
+	protected $attachments = [];
+	protected $embeddings = [];
 	
 
 	
@@ -57,14 +60,36 @@ class Engine
 		switch ( $this->mailContentType )
 		{
 			case 'text/plain' : 
-				return Builder::addTextHtmlFromText($mail, $this->template);
+				$mail = Builder::addTextHtmlFromText($mail, $this->template);
 				
 			case 'text/html': 
-				return Builder::addTextHtmlFromHtml($mail, $this->template);
+				$mail = Builder::addTextHtmlFromHtml($mail, $this->template);
 				
 			default:
 				throw new \Nettools\MassMailing\TemplateEngine\Exception('Unsupported content-type : ' . $this->mailContentType);
 		}
+		
+		
+		
+		// create attachments and embeddings objects
+		$atts = [];
+		foreach ( $this->attachments as $att )
+			$atts[] = $att->create();
+
+		$embeds = [];
+		foreach ( $this->embeddings as $emb )
+			$embeds[] = $emb->create();
+		
+		
+		// now add embeddings and attachements objects to mail object
+		if ( count($embeds) )
+			$mail = Builder::addEmbeddingObjects($mail, $embeds);
+
+		if ( count($atts) )
+			$mail = Builder::addAttachmentObjects($mail, $atts);
+		
+		
+		return $mail;	
 	}	
 	
 	
@@ -120,6 +145,63 @@ class Engine
 	{
 		$this->preProcessors = $preprocessors;
 		return $this;
+	}
+	
+	
+	
+	/**
+	 * Set attachments array
+	 *
+	 * @param \Nettools\Mailing\FluentEngine\Attachment[] $attachments Array of \Nettools\Mailing\FluentEngine\Attachment objects created with Engine::attachment fluent calls
+	 * @return Engine Returns $this for chaining calls
+	 */
+	function setAttachments(array $attachments)
+	{
+		$this->attachments = $attachments;
+		return $this;
+	}
+	
+	
+		
+	/**
+	 * Set embeddings array
+	 *
+	 * @param \Nettools\Mailing\FluentEngine\Embedding[] $embeddings Array of \Nettools\Mailing\FluentEngine\Embedding objects created with Engine::embedding fluent calls
+	 * @return Engine Returns $this for chaining calls
+	 */
+	function setEmbeddings(array $embeddings)
+	{
+		$this->embeddings = $embeddings;
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Create attachment fluent description
+	 *
+	 * @param string $content Attachment filepath or content (if $isFile = false)
+	 * @param string $ctype Mime type
+	 * @return \Nettools\Mailing\FluentEngine\Attachment
+	 */	
+	function attachment($content, $ctype)
+	{
+		return new Attachment($content, $ctype);
+	}
+	
+	
+		
+	/**
+	 * Create embedding fluent description
+	 *
+	 * @param string $content Embedding filepath or content (if $isFile = false)
+	 * @param string $ctype Mime type
+	 * @param string $cid Content-Id
+	 * @return \Nettools\Mailing\FluentEngine\Embedding
+	 */	
+	function embedding($content, $ctype, $cid)
+	{
+		return new Embedding($content, $ctype, $cid);
 	}
 	
 	
