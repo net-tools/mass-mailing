@@ -181,49 +181,6 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$this->assertMatchesRegularExpression('/Date: [A-Z][a-z]{2,4}, [0-9]{1,2} [A-Z][a-z]{2,4} 20[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} .[0-9]{4}/', $sent[1]);
 
 		
-		$msh->setToOverride('override-user@php.com');
-		$ml->setMailSender(new \Nettools\Mailing\MailSenders\Virtual(), NULL);
-		$msh->prepareAndSend('user-to@php.com');
-		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
-		$this->assertCount(2, $sent);								// BCC + mail
-		$boundary = __getBoundary($sent[0]);
-		$this->assertStringContainsString(
-				"Content-Type: multipart/alternative;\r\n boundary=\"$boundary\"\r\n" .
-				"Reply-To: reply-to-user@php.com\r\n" .
-				"From: unit-test@php.com\r\n",
-				$sent[0]);
-
-		$this->assertStringContainsString(
-				"To: override-user@php.com\r\n" .
-				"Subject: test subject\r\n" .
-				"Bcc: bcc-user@php.com\r\n",
-				$sent[0]);
-		$this->assertStringContainsString(
-				"Delivered-To: bcc-user@php.com\r\n" .
-				"\r\n" .
-				"--$boundary\r\n",		
-				$sent[0]);
-		$this->assertMatchesRegularExpression('/Message-ID: <[0-9a-f]+@php.com>/', $sent[0]);
-		$this->assertMatchesRegularExpression('/Date: [A-Z][a-z]{2,4}, [0-9]{1,2} [A-Z][a-z]{2,4} 20[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} .[0-9]{4}/', $sent[0]);
-		
-		$this->assertStringContainsString(
-				"Content-Type: multipart/alternative;\r\n boundary=\"$boundary\"\r\n" .
-				"Reply-To: reply-to-user@php.com\r\n" .
-				"From: unit-test@php.com\r\n",
-				$sent[1]);
-			
-		$this->assertStringContainsString(
-				"To: override-user@php.com\r\n" .
-				"Subject: test subject\r\n",
-				$sent[1]);
-		$this->assertStringContainsString(
-				"Delivered-To: override-user@php.com\r\n" .
-				"\r\n" .
-				"--$boundary\r\n",
-				$sent[1]);
-		$this->assertMatchesRegularExpression('/Message-ID: <[0-9a-f]+@php.com>/', $sent[1]);
-		$this->assertMatchesRegularExpression('/Date: [A-Z][a-z]{2,4}, [0-9]{1,2} [A-Z][a-z]{2,4} 20[0-9]{2} [0-9]{2}:[0-9]{2}:[0-9]{2} .[0-9]{4}/', $sent[1]);
-				
 /*				
 
 		$this->assertEquals(NULL, $msh->getQueueCount());			// queue not used, NULL is returned

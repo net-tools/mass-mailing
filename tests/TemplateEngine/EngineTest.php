@@ -48,8 +48,8 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	{
 		// using template
 		$e = new Engine('To be processed', 'text/plain', [
-															'attachements' => [ $e->attachment('{content1 of file}', 'text/plain')->asRawContent(),
-																			   	$e->attachment('{content2 of file}', 'text/plain')->asRawContent()->withFileName('MyFile.txt') ]
+															'attachements' => [ Engine::attachment('{content1 of file}', 'text/plain')->asRawContent(),
+																			   	Engine::attachment('{content2 of file}', 'text/plain')->asRawContent()->withFileName('MyFile.txt') ]
 														 ]);
 		$mail = $e->build();
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
@@ -81,8 +81,8 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	{
 		// using template
 		$e = new Engine('To be processed', 'text/plain', [
-															'embeddings' => [	$e->embedding('{content1 of file}', 'text/plain', 'cid1')->asRawContent(),
-																			   	$e->embedding('{content2 of file}', 'text/plain', 'cid2')->asRawContent() ]
+															'embeddings' => [	Engine::embedding('{content1 of file}', 'text/plain', 'cid1')->asRawContent(),
+																			   	Engine::embedding('{content2 of file}', 'text/plain', 'cid2')->asRawContent() ]
 														 ]);
 		$mail = $e->build();
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);

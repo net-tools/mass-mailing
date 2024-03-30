@@ -186,7 +186,7 @@ class Engine
 	 * @param string $ctype Mime type
 	 * @return \Nettools\Mailing\FluentEngine\Attachment
 	 */	
-	function attachment($content, $ctype)
+	static function attachment($content, $ctype)
 	{
 		return new Attachment($content, $ctype);
 	}
@@ -201,7 +201,7 @@ class Engine
 	 * @param string $cid Content-Id
 	 * @return \Nettools\Mailing\FluentEngine\Embedding
 	 */	
-	function embedding($content, $ctype, $cid)
+	static function embedding($content, $ctype, $cid)
 	{
 		return new Embedding($content, $ctype, $cid);
 	}
