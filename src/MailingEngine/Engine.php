@@ -113,7 +113,6 @@ class Engine
 	 *   - cc : If set, email CC address to send a copy to
 	 *   - testRecipients : If set, an array of email addresses to send emails to for testing purposes
 	 *   - replyTo : If set, an email address to set in a ReplyTo header
-	 *   - toOverride : If set, sends all email to a given address (debug purposes)
 	 *   - testMode : If true, email are sent to testing addresses (see `testRecipients` optionnal parameter) ; defaults to false
 	 *   - preProcessors : an array of PreProcessor objects that will update mail content
 	 *
@@ -141,12 +140,12 @@ class Engine
 		$this->queueParams = array_key_exists('queueParams', $params) ? $params['queueParams'] : NULL;
 		$this->bcc = array_key_exists('bcc', $params) ? $params['bcc'] : NULL;
 		$this->cc = array_key_exists('cc', $params) ? $params['cc'] : NULL;
-		$this->toOverride = array_key_exists('toOverride', $params) ? $params['toOverride'] : NULL;
 		$this->testRecipients = array_key_exists('testRecipients', $params) ? $params['testRecipients'] : NULL;
 		$this->replyTo = array_key_exists('replyTo', $params) ? $params['replyTo'] : NULL;
 		$this->preProcessors = array_key_exists('preProcessors', $params) ? $params['preProcessors'] : [];
 		
 		
+		// init after object construction done
 		$this->_initialize();
 	}
 	
@@ -158,25 +157,6 @@ class Engine
 	protected function _initialize()
 	{		
 	}
-	
-	
-	
-	/** 
-	 * Getter for ToOverride
-	 *
-	 * @return NULL|string Returns NULL if no override, a string with email address otherwise
-	 */
-	public function getToOverride() { return $this->toOverride;}
-	
-	
-	
-	/**
-	 * Setter for ToOverride
-	 * 
-	 * @param strig $o Email address to send all emails to (for debugging purpose)
-	 * return \Nettools\MassMailing\MailingEngine\Engine Returns the calling object for chaining
-	 */
-	public function setToOverride($o) { $this->toOverride = $o; return $this;}
 	
 	
 	
@@ -226,9 +206,6 @@ class Engine
 	 */
 	public function ready()
 	{
-		if ( empty($this->mailer) )
-            throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::mailer is not defined");
-
 		if ( empty($this->mail) )
             throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::mail is not defined");
         
@@ -297,16 +274,14 @@ class Engine
 			$to = $mto; 
 
 
-		// checking overide parameter
-		$dest = $this->toOverride;
-		$dest or $dest = $to;		
+		$dest = $to;		
 		
 		
 		// checking email syntax
 		if ( is_null($dest) )
 			throw new \Nettools\MassMailing\MailingEngine\Exception("Empty email recipient");
-		if ( !preg_match("/^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$/", $dest) )
-			throw new \Nettools\MassMailing\MailingEngine\Exception("Malformed email : '$dest'");
+		/*if ( !preg_match("/^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$/", $dest) )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Malformed email : '$dest'");*/
 			
 		
 		// dealing with BCC
@@ -325,7 +300,7 @@ class Engine
 		// checking a subject is defined, either in constructor parameters or in this method argument
 		$subject = $subject ? $subject : $this->subject;
 		if ( is_null($subject) )
-            throw new \Nettools\MassMailing\MailingEngine\Exception("Subject in 'prepareAndSend' method is not defined");
+            throw new \Nettools\MassMailing\MailingEngine\Exception("Email subject undefined");
 
 
 		// if sending to a queue
