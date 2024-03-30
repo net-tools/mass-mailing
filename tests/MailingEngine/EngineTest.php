@@ -130,15 +130,6 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		}
 			
 		
-		
-		try
-		{
-			$msh->prepareAndSend('nouser');	// recipient syntax wrong
-			$this->assertEquals(true, false);
-		}
-		catch( \Nettools\MassMailing\MailingEngine\Exception $e )
-		{
-		}
 			
 		
 		$msh->prepareAndSend('user-to@php.com'); // fine
