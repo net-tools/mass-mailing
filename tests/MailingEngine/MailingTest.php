@@ -54,8 +54,10 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		$m = (new MailingEngine($ml))
 				->mailing([ 'from' => 'unit-test@php.com' ])
 					->about('test subject')
-					->toTestRecipients(['test1@me.com', 'test2@me.com'])
-					->send($mail, 'recipient@domain.at');
+					->toTestRecipients(['test1@me.com', 'test2@me.com']);
+		
+		$m->send($mail, 'recipient@domain.at');
+		$m->send($mail, 'recipient2@domain.at');
 
 		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
 		$this->assertCount(2, $sent);	
