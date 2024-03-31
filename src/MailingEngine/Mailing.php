@@ -28,11 +28,9 @@ class Mailing
 	
 	protected $_engine = NULL;
 	
-	/*protected $_queue = NULL;
-	protected $_queueParams = NULL;
-	
-	protected $_testMode = NULL;
-	protected $_testRecipients = NULL;*/
+	protected $_queue = NULL;
+	protected $_queueParams = NULL;	
+	protected $_testRecipients = [];
 
 	
 	
@@ -53,6 +51,37 @@ class Mailing
 			if ( method_exists($this, $k) )
 				call_user_func([$this, $k], $v);
 	}
+	
+	
+	
+	/** 
+	 * Send emails to queue subsystem
+	 *
+	 * @param string $queueName Queue name
+	 * @param string[] $queueParams Associative array of parameters for queue, defining `root` and `batchCount` values
+	 * @return Engine Returns $this for chaining calls
+	 */
+	 function toQueue($queueName, $queueParams)
+	 {
+		 $this->_queue = $queueName;
+		 $this->_queueParams = $queueParams;
+		 
+		 return $this;
+	 }
+	
+	
+	
+	/** 
+	 * Set test recipients
+	 *
+	 * @param string[] $testRecipients
+	 * @return Engine Returns $this for chaining calls
+	 */
+	 function toTestRecipients(array $testRecipients)
+	 {
+		 $this->_testRecipients = $testRecipients;
+		 return $this;
+	 }
 	
 	
 
@@ -99,9 +128,24 @@ class Mailing
 	
 	
 	/** 
+	 * Fluent function to add a user defined header
+	 *
+	 * @param string $name
+	 * @param string $value
+	 * @return Engine Returns $this for chaining calls
+	 */
+	function header($name, $value)
+	{
+		$this->_userDefinedHeaders[$name] = $value;
+		return $this;
+	}
+	
+	
+	
+	/** 
 	 * Fluent function to set UserDefinedHeaders value
 	 *
-	 * @param string $headers Associative array of headers header_name => header_value ; previous value of userDefinedHeaders is lost
+	 * @param string $headers Associative array of headers ; key is header name, value is header value ; previous value of _userDefinedHeaders is lost
 	 * @return Engine Returns $this for chaining calls
 	 */
 	function withHeaders(array $headers)
@@ -113,11 +157,11 @@ class Mailing
 	
 	
 	/**
-	 * Prepare email before sending it
+	 * Prepare email headers before sending it
 	 *
 	 * @param \Nettools\Mailing\MailBuilder\Content $mail
 	 */
-	function setHeaders(Content $mail)
+	function prepareHeaders(Content $mail)
 	{
 		if ( $this->_replyTo )
 			$mail->headers->replyTo = $this->_replyTo;
@@ -139,7 +183,21 @@ class Mailing
 	function send(Content $mail, $to, $overrideSubject = NULL)
 	{
 		// set appropriate headers (except From, Subject, and To)
-		$this->setHeaders($mail);
+		$this->prepareHeaders($mail);
+		
+		
+		// test mode enabled ? if so, ignoring $to parameter and sending to next available test recipient
+		if ( count($this->_testRecipients) )
+		{
+			// next test mail
+			$to = current($this->_testRecipients);
+			next($this->_testRecipients);
+
+			// if no more test email ($to = NULL), exiting as we only simulate
+			if ( !$to )
+				return; 
+		}		
+		
 
 		// sending mail
 		$this->_engine->getMailer()->sendmail($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject);

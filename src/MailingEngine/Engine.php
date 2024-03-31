@@ -69,68 +69,16 @@ class Engine
 	 *   - testRecipients : If set, an array of email addresses to send emails to for testing purposes
 	 *   - replyTo : If set, an email address to set in a ReplyTo header
 	 *   - testMode : If true, email are sent to testing addresses (see `testRecipients` optionnal parameter) ; defaults to false
-	 *
-	 * @param \Nettools\Mailing\Mailer $mailer
-	 * @param string $mail Mail content as a string
-	 * @param string $mailContentType May be 'text/plain' or 'text/html'
-	 * @param string $from Sender address
-	 * @param string $subject Email subject ; may be overriden when calling `send` method
-	 * @param string[] $params Associative array with optionnal parameters
 	 */
-/*	function __construct(Mailer $mailer, $mail, $mailContentType, $from, $subject, array $params = [])
-	{
-		// paramètres
-		$this->mailer = $mailer;
-		$this->mail = $mail;
-		$this->mailContentType = $mailContentType;
-		$this->from = $from;
-		$this->subject = $subject ? $subject : NULL;
 
-		
-		// optionnal parameters
-		$this->testMode = array_key_exists('testMode', $params) ? $params['testMode'] : false;
-		$this->template = array_key_exists('template', $params) ? $params['template'] : '%content%';
-		$this->queue = array_key_exists('queue', $params) ? $params['queue'] : NULL;
-		$this->queueParams = array_key_exists('queueParams', $params) ? $params['queueParams'] : NULL;
-		$this->bcc = array_key_exists('bcc', $params) ? $params['bcc'] : NULL;
-		$this->cc = array_key_exists('cc', $params) ? $params['cc'] : NULL;
-		$this->testRecipients = array_key_exists('testRecipients', $params) ? $params['testRecipients'] : NULL;
-		$this->replyTo = array_key_exists('replyTo', $params) ? $params['replyTo'] : NULL;
-		$this->preProcessors = array_key_exists('preProcessors', $params) ? $params['preProcessors'] : [];
-		
-		
-		// init after object construction done
-		$this->_initialize();
-	}*/
-	
-	
-	
-	
-	/**
-	 * Do some init stuff after object is constructed
-	 */
-	protected function _initialize()
-	{		
-	}
-	
-	
-	
-	/**
-	 * Accessor for test mode
-	 *
-	 * @return bool
-	 */
-	public function getTestMode() { return $this->testMode;}
-	
-		
 	
 	/**
 	 * Destruct object
 	 */
 	public function destroy()
 	{
-		if ( $this->mailer )
-			$this->mailer->destroy();
+		if ( $this->_mailer )
+			$this->_mailer->destroy();
 	}
 	
 	
@@ -183,25 +131,6 @@ class Engine
 			throw new \Nettools\MassMailing\MailingEngine\Exception("Empty email recipient");
 		/*if ( !preg_match("/^[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*@[a-z0-9]+([_|\.|-]{1}[a-z0-9]+)*[\.]{1}[a-z]{2,6}$/", $dest) )
 			throw new \Nettools\MassMailing\MailingEngine\Exception("Malformed email : '$dest'");*/
-			
-		
-		// dealing with BCC
-		if ( $this->bcc )
-			$mail->headers->set('Bcc', $this->bcc);
-
-		// dealing with CC
-		if ( $this->cc )
-			$mail->headers->set('Cc', $this->bcc);
-		
-		// dealing with replyTo
-		if ( $this->replyTo )
-			$mail->headers->set('Reply-To', $this->replyTo);
-
-		
-		// checking a subject is defined, either in constructor parameters or in this method argument
-		$subject = $subject ? $subject : $this->subject;
-		if ( is_null($subject) )
-            throw new \Nettools\MassMailing\MailingEngine\Exception("Email subject undefined");
 
 
 		// if sending to a queue
