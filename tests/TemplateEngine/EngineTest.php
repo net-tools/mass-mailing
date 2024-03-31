@@ -6,6 +6,7 @@ namespace Nettools\MassMailing\TemplateEngine\Tests;
 
 use \Nettools\MassMailing\TemplateEngine\Engine;
 use \Nettools\MassMailing\TemplateEngine\PreProcessor;
+use \Nettools\MassMailing\TemplateEngine\PreProcessor_SearchReplace;
 use \Nettools\Mailing\MailBuilder\Builder;
 
 
