@@ -30,7 +30,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		// no processing done
 		$e = (new Engine())->template()->text('Dummy')->noAlternatePart();
 		$mail = $e->build();
-		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);		
+		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\TextPlainContent);		
 		$this->assertStringContainsString('Dummy', $mail->getContent());
 
 		
@@ -98,7 +98,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 					->withData([ '%placeholder%' => 'here_is_the_value' ]);
 
 		$mail = $e->build();
-		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
+		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\TextPlainContent);
 		$this->assertStringContainsString('<p>To be processed : [here_is_the_value]</p>', $mail->getContent());
 	}
 	

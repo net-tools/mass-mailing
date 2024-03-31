@@ -16,8 +16,8 @@ use \Nettools\Mailing\FluentEngine\Content;
  */
 class Template extends Content
 {
-	protected $preProcessors = [];
-	protected $preProcessorsData = NULL;
+	protected $_preProcessors = [];
+	protected $_preProcessorsData = NULL;
 	
 
 	
@@ -30,8 +30,8 @@ class Template extends Content
 	{
 		$txt = $this->_content;
 				
-		foreach ( $this->preProcessors as $p )
-			$txt = $p->process($txt, $this->preProcessorsData);
+		foreach ( $this->_preProcessors as $p )
+			$txt = $p->process($txt, $this->_preProcessorsData);
 			
 		return $txt;	
 	}
@@ -46,7 +46,7 @@ class Template extends Content
 	 */
 	function preProcessor(PreProcessor $preprocessor)
 	{
-		$this->preProcessors[] = $preprocessor;
+		$this->_preProcessors[] = $preprocessor;
 		return $this;
 	}
 	
@@ -60,7 +60,7 @@ class Template extends Content
 	 */
 	function preProcessors(array $preprocessors)
 	{
-		$this->preProcessors = array_merge($this->preProcessors, $preprocessors);
+		$this->_preProcessors = array_merge($this->_preProcessors, $preprocessors);
 		return $this;
 	}
 	
@@ -74,7 +74,7 @@ class Template extends Content
 	 */
 	function withData($data)
 	{
-		$this->preProcessorsData = $data;
+		$this->_preProcessorsData = $data;
 		return $this;
 	}
 	
