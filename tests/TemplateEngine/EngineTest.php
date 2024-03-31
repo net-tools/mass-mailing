@@ -35,7 +35,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		// using template
 		$e = (new Engine())->template()
 					->text('To be processed')
-					->noAlternativePart()
+					->noAlternatePart()
 					->attachSome([
 									Engine::attachment('{content1 of file}', 'text/plain')->asRawContent(),
 									Engine::attachment('{content2 of file}', 'text/plain')->asRawContent()->withFileName('MyFile.txt')
@@ -57,7 +57,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		// using template
 		$e = (new Engine())->template()
 					->text('To be processed')
-					->noAlternativePart()
+					->noAlternatePart()
 					->embedSome([
 									Engine::embedding('{content1 of file}', 'text/plain', 'cid1')->asRawContent(),
 									Engine::embedding('{content2 of file}', 'text/plain', 'cid2')->asRawContent()
@@ -79,7 +79,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	{
 		$e = (new Engine())->template()
 					->text('To be processed')
-					->noAlternativePart()
+					->noAlternatePart()
 					->preProcessor(new Processor1())
 					->preProcessors([new PreProcessor_SearchReplace()])
 					->withData([ '%placeholder%' => 'here_is_the_value' ]);
