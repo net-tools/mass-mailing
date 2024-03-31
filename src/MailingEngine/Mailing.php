@@ -186,6 +186,7 @@ class Mailing
 		// creating queue
 		$store = Store::read($this->_queue->root, true);
 		$this->_queueObj = $store->createQueue($this->_queue->name . '_' . date('Ymd'), $this->_queue->batchCount);
+		return true;
 	}
 	
 	
