@@ -91,7 +91,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	public function testPreProcessor()
 	{
 		$e = (new Engine())->template()
-					->text('To be processed')
+					->text('To be processed : [%placeholder%]')
 					->noAlternatePart()
 					->preProcessor(new Processor1())
 					->preProcessors([new PreProcessor_SearchReplace()])

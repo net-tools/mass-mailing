@@ -67,9 +67,9 @@ class Template extends Content
 	
 	
 	/**
-	 * Set preprocess data
+	 * Set preprocessors data
 	 *
-	 * @param mixed $data
+	 * @param mixed $data Preprocessors data
 	 * @return Template Returns $this for chaining calls
 	 */
 	function withData($data)
@@ -97,13 +97,27 @@ class Template extends Content
 	/**
 	 * Build the email with any customization required, thanks to preprocessors objects array 
 	 *
-	 * @param mixed $data Data that may be required during rendering process
 	 * @return \Nettools\Mailing\MailBuilder\Content Return the email built
 	 * @throws \Nettools\MassMailing\MailingEngine\Exception
 	 */
 	public function build()
 	{
 		return $this->create();
+	}
+	
+	
+	
+	/**
+	 * Build the email with any customization required, thanks to preprocessors objects array, with preprocessors data as argument
+	 * Preprocessors data can also be set by calling `withData` before `build` function.
+	 *
+	 * @param mixed $data Data that may be required during rendering process
+	 * @return \Nettools\Mailing\MailBuilder\Content Return the email built
+	 * @throws \Nettools\MassMailing\MailingEngine\Exception
+	 */
+	public function buildWithData($data)
+	{
+		return $this->withData($data)->build();
 	}
 	
 }

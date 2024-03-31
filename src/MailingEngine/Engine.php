@@ -5,11 +5,7 @@ namespace Nettools\MassMailing\MailingEngine;
 
 
 // clauses use
-use \Nettools\Mailing\MailBuilder\Builder;
-use \Nettools\Mailing\MailBuilder\Content;
 use \Nettools\Mailing\Mailer;
-use \Nettools\MassMailing\QueueEngine\Queue;
-use \Nettools\MassMailing\QueueEngine\Store;
 
 
 
@@ -18,86 +14,48 @@ use \Nettools\MassMailing\QueueEngine\Store;
 /**
  * Helper class to send several emails
  *
- * Subject, template, from address, bcc, replyto can be set at object construction, then all required customizations are applied to mail objects sent through `send` method.
+ * Subject, from address, replyto can be set at object construction, then all required customizations are applied to mail objects sent through `send` method.
  * It also makes it possible to send emails to tests recipients or to a queue object, again just by setting appropriate parameters of constructor
  */
 class Engine 
 {
-	protected $mail = NULL;
-	protected $mailContentType = NULL;
-	protected $from = NULL;
-	protected $subject = NULL;
-	protected $template = NULL;
-	protected $queue = NULL;
-	protected $queueParams = NULL;
-	protected $testMode = NULL;
-	protected $cc = NULL;
-	protected $bcc = NULL;
-	protected $replyTo = false;
-	protected $testRecipients = NULL;	
-	protected $preProcessors = [];
-	
-	protected $mailer = NULL;
+	protected $_mailer = NULL;
 	
 	
 	
 	/**
-	 * Create a Content object from a string
+	 * Constructor
 	 *
-	 * @param string $mail Mail raw content as string
-	 * @return \Nettools\Mailing\MailBuilder\Content
-	 * @throws \Nettools\MassMailing\MailingEngine\Exception
-	 */
-	protected function _createMailContent($mail)
+	 * @param \Nettools\Mailing\Mailer $mailer
+     */	
+	function __construct(Mailer $mailer)
 	{
-		switch ( $this->mailContentType )
-		{
-			case 'text/plain' : 
-				return Builder::addTextHtmlFromText($mail, $this->template);
-				
-			case 'text/html': 
-				return Builder::addTextHtmlFromHtml($mail, $this->template);
-				
-			default:
-				throw new \Nettools\MassMailing\MailingEngine\Exception('Unknown content-type : ' . $this->mailContentType);
-		}
+		$this->_mailer = $mailer;
 	}
 	
 	
 	
 	/**
-	 * Preprocess the mail content through an array of PreProcessor objects
-	 * 
-	 * @param mixed $data Any data required by pre-processor
-	 * @return string
+	 * Prepare mailing through a Mailing object with fluent design
+	 *
+	 * @param string[] $params Associative array of parameters to set in constructor ; equivalent of calling corresponding fluent functions
 	 */
-	protected function _preProcess($data)
+	function mailing(array $params = [])
 	{
-		$txt = $this->mail;
-				
-		foreach ( $this->preProcessors as $p )
-			$txt = $p->process($txt, $data);
-			
-		return $txt;	
+		return new Mailing($this, $params);
 	}
-
-
+	
+	
 	
 	/**
-	 * Render email and get a \Nettools\Mailing\MailBuilder\Content object that can be passed as argument to `send`
+	 * Get underlying Mailer object
 	 *
-	 * @param mixed $data Data that may be required during rendering process
-	 * @return \Nettools\Mailing\MailBuilder\Content
-	 * @throws \Nettools\MassMailing\MailingEngine\Exception
+	 * @return Mailer
 	 */
-	protected function _render($data)
+	function getMailer()
 	{
-		// testing mandatory parameters (exception thrown)
-		$this->ready();
-		
-		// render email and get a Content object
-		return $this->_createMailContent($this->_preProcess($data));
-	}	
+		return $this->_mailer;
+	}
 	
 	
 	
@@ -105,15 +63,12 @@ class Engine
 	 * Constructor
 	 *
 	 * Optionnal parameters for `$params` are :
-	 *   - template : template string used for email content ; if set, it must include a `%content%` string that will be replaced (call to `render` method) by the actual mail content (arg `$mail`)
 	 *   - queue : If set, a Nettools\MassMailing\QueueEngine\Queue name to create and append emails to
 	 *   - queueParams : If set, parameters of queue subsystem as an associative array with values for keys `root` and `batchCount`
-	 *   - bcc : If set, email BCC address to send a copy to
-	 *   - cc : If set, email CC address to send a copy to
+
 	 *   - testRecipients : If set, an array of email addresses to send emails to for testing purposes
 	 *   - replyTo : If set, an email address to set in a ReplyTo header
 	 *   - testMode : If true, email are sent to testing addresses (see `testRecipients` optionnal parameter) ; defaults to false
-	 *   - preProcessors : an array of PreProcessor objects that will update mail content
 	 *
 	 * @param \Nettools\Mailing\Mailer $mailer
 	 * @param string $mail Mail content as a string
@@ -122,7 +77,7 @@ class Engine
 	 * @param string $subject Email subject ; may be overriden when calling `send` method
 	 * @param string[] $params Associative array with optionnal parameters
 	 */
-	function __construct(Mailer $mailer, $mail, $mailContentType, $from, $subject, array $params = [])
+/*	function __construct(Mailer $mailer, $mail, $mailContentType, $from, $subject, array $params = [])
 	{
 		// paramètres
 		$this->mailer = $mailer;
@@ -146,7 +101,8 @@ class Engine
 		
 		// init after object construction done
 		$this->_initialize();
-	}
+	}*/
+	
 	
 	
 	
@@ -166,26 +122,7 @@ class Engine
 	 */
 	public function getTestMode() { return $this->testMode;}
 	
-	
-	
-	/**
-	 * Get raw mail string before any rendering actions
-	 *
-	 * @return string
-	 */
-	public function getRawMail() { return $this->mail; }
-	
-	
-	
-	/**
-	 * Update raw mail string
-	 * 
-	 * @param string $m
-	 * return \Nettools\MassMailing\MailingEngine\Engine Returns $this for chaining
-	 */
-	public function setRawMail($m) { $this->mail = $m; return $this; }
-
-	
+		
 	
 	/**
 	 * Destruct object
@@ -194,41 +131,6 @@ class Engine
 	{
 		if ( $this->mailer )
 			$this->mailer->destroy();
-	}
-	
-	
-	
-	/** 
-	 * Testing that required parameters are set
-	 *
-	 * @throws \Nettools\MassMailing\MailingEngine\Exception
-	 */
-	public function ready()
-	{
-		if ( empty($this->mail) )
-            throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::mail is not defined");
-        
-		if ( empty($this->mailContentType) )
-        	throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::mailContentType is not defined");
-
-		if ( empty($this->from) )
-            throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::from is not defined");
-
-		if ( empty($this->template) )
-            throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::template is not defined");
-		
-		
-		if ( $this->testMode )
-		{
-			if ( empty($this->testRecipients) )
-            	throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::testRecipients is not defined");
-			
-			if ( !is_array($this->testRecipients) )
-            	throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::testRecipients is not an array");
-			
-			if ( count($this->testRecipients) == 0 )
-            	throw new \Nettools\MassMailing\MailingEngine\Exception("MailerEngine\\Engine::testRecipients is an empty array");
-		}
 	}
 	
 	
