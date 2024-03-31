@@ -35,9 +35,12 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 
 		
 		// using template
-		$e = new Engine('To be processed', 'text/plain', [ 'template' => "Template is slashes around : /" . Builder::TEMPLATE_PLACEHOLDER . "/" ]);
+		$e = (new Engine())->template()
+								->text('To be processed')
+								->withTemplate("Template is slashes around : /" . Builder::TEMPLATE_PLACEHOLDER . "/")
+								->noAlternatePart();
 		$mail = $e->build();
-		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
+		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\TextPlainContent);
 		$this->assertStringContainsString('Template is slashes around : /To be processed/', $mail->getContent());
 	}
 	

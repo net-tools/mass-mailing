@@ -26,6 +26,8 @@ class Mailing
 	protected $_replyTo = false;
 	protected $_userDefinedHeaders = [];
 	
+	protected $_engine = NULL;
+	
 	/*protected $_queue = NULL;
 	protected $_queueParams = NULL;
 	
