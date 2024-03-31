@@ -33,6 +33,10 @@ class Queue {
 	public $store;
 	
 	
+	const DEFAULT_BATCH_COUNT = 50;
+	
+	
+	
 	
 	/** 
 	 * Send an email from the queue ; we may modify the recipient, bcc, and headers
@@ -181,7 +185,7 @@ class Queue {
 	 * @return Queue
 	 * @throws \Nettools\Mailing\Exception
 	 */
-	static function create($name, $params, $batchCount = 50)
+	static function create($name, $params, $batchCount = self::DEFAULT_BATCH_COUNT)
 	{
 		$q = new Queue();
 		$q->count = 0;

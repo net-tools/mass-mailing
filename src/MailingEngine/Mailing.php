@@ -5,9 +5,7 @@ namespace Nettools\MassMailing\MailingEngine;
 
 
 // clauses use
-/*use \Nettools\Mailing\Mailer;
-use \Nettools\MassMailing\QueueEngine\Queue;
-use \Nettools\MassMailing\QueueEngine\Store;*/
+use \Nettools\MassMailing\QueueEngine\Store;
 use \Nettools\Mailing\MailBuilder\Content;
 
 
@@ -17,7 +15,7 @@ use \Nettools\Mailing\MailBuilder\Content;
  * Helper class to send several emails
  *
  * Subject, from address, replyto can be set at object construction, then all required customizations are applied to mail objects sent through `send` method.
- * It also makes it possible to send emails to tests recipients or to a queue object, again just by setting appropriate parameters of constructor
+ * It also makes it possible to send emails to tests recipients or to a queue object, using fluent design
  */
 class Mailing
 {
@@ -26,13 +24,13 @@ class Mailing
 	protected $_replyTo = false;
 	protected $_userDefinedHeaders = [];
 	
-	protected $_engine = NULL;
-	
 	protected $_queue = NULL;
-	protected $_queueParams = NULL;	
+	protected $_queueObj = NULL;
 	protected $_testRecipients = [];
 
+	protected $_engine = NULL;
 	
+
 	
 	
 	/**
@@ -55,17 +53,14 @@ class Mailing
 	
 	
 	/** 
-	 * Send emails to queue subsystem
+	 * Send emails to queue subsystem defined with fluent design
 	 *
-	 * @param string $queueName Queue name
-	 * @param string[] $queueParams Associative array of parameters for queue, defining `root` and `batchCount` values
+	 * @param Queue $queue Queue definition object
 	 * @return Engine Returns $this for chaining calls
 	 */
-	 function toQueue($queueName, $queueParams)
+	 function toQueue(Queue $queue)
 	 {
-		 $this->_queue = $queueName;
-		 $this->_queueParams = $queueParams;
-		 
+		 $this->_queue = $queue;		 
 		 return $this;
 	 }
 	
@@ -172,6 +167,44 @@ class Mailing
 	
 	
 	
+	/**
+	 * Create queue if not done
+	 *
+	 * @return bool Returns True if queue target is enabled (queue may be created as required) ; returns False if queue target disabled
+	 */
+	public function createQueue()
+	{
+		// queue already created
+		if ( $this->_queueObj )
+			return true;
+		
+		// queue not used
+		if ( is_null($this->_queue) )
+			return false;
+		
+		
+		// creating queue
+		$store = Store::read($this->_queue->root, true);
+		$this->_queueObj = $store->createQueue($this->_queue->name . '_' . date('Ymd'), $this->_queue->batchCount);
+	}
+	
+	
+	
+	/**
+	 * Mass-mailing is now over, do house cleaning stuff ; if using queue, committing queue to storage
+	 */
+	public function done()
+	{
+		// if using queue, commit updates
+		if ( $this->_queueObj && ($this->_queueObj->count > 0) )
+			$this->_queueObj->commit();
+		
+		// closing connections
+		$this->_engine->destroy();
+	}
+	
+	
+	
 	/** 
 	 * Send an email already created with TemplateEngine or any other way, provided it's a Nettools\Mailing\MailBuilder\Content object
 	 * and apply any headers required
@@ -200,7 +233,10 @@ class Mailing
 		
 
 		// sending mail
-		$this->_engine->getMailer()->sendmail($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject);
+		if ( $this->createQueue() )
+			$this->_queueObj->push($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject); 
+		else
+			$this->_engine->getMailer()->sendmail($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject);
 	}
 }
 
