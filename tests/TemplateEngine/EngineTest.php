@@ -9,6 +9,17 @@ use \Nettools\Mailing\MailBuilder\Builder;
 
 
 
+class Processor1 implements PreProcessor
+{
+	function process($txt, $data = NULL)
+	{
+		return "<p>$txt</p>";
+	}	
+}
+
+
+
+
 
 class EngineTest extends \PHPUnit\Framework\TestCase
 {
