@@ -15,7 +15,7 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	public function testParams()
 	{
 		// no processing done
-		$e = new Engine('Dummy', 'text/plain');
+		$e = (new Engine())->template()->text('Dummy')->noAlternatePart();
 		$mail = $e->build();
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);		
 		$this->assertStringContainsString('Dummy', $mail->getContent());
@@ -30,27 +30,16 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	
 	
 
-	public function testAttachment()
-	{
-		// using template
-		$e = new Engine('To be processed', 'text/plain');
-		$e->setAttachments([ $e->attachment('{content of file}', 'text/plain')->asRawContent() ]);
-		$mail = $e->build();
-		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
-		$this->assertEquals(true, $mail->getPart(1) instanceof \Nettools\Mailing\MailBuilder\Attachment);
-		$this->assertStringContainsString("Content-Disposition: attachment;\r\n filename=\"no_name\"", $mail->getContent());
-		$this->assertStringContainsString(base64_encode('{content of file}'), $mail->getContent());
-	}
-	
-	
-
 	public function testAttachments()
 	{
 		// using template
-		$e = new Engine('To be processed', 'text/plain', [
-															'attachments' => [ 	Engine::attachment('{content1 of file}', 'text/plain')->asRawContent(),
-																			   	Engine::attachment('{content2 of file}', 'text/plain')->asRawContent()->withFileName('MyFile.txt') ]
-														 ]);
+		$e = (new Engine())->template()
+					->text('To be processed')
+					->noAlternativePart()
+					->attachSome([
+									Engine::attachment('{content1 of file}', 'text/plain')->asRawContent(),
+									Engine::attachment('{content2 of file}', 'text/plain')->asRawContent()->withFileName('MyFile.txt')
+								]);
 		$mail = $e->build();
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
 		$this->assertEquals(true, $mail->getPart(1) instanceof \Nettools\Mailing\MailBuilder\Attachment);
@@ -61,29 +50,19 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString(base64_encode('{content2 of file}'), $mail->getPart(2)->getContent());
 	}
 	
-	
 
-	public function testEmbedding()
-	{
-		// using template
-		$e = new Engine('To be processed', 'text/plain');
-		$e->setEmbeddings([ $e->embedding('{content of file}', 'text/plain', 'cid1')->asRawContent() ]);
-		$mail = $e->build();
-		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
-		$this->assertEquals(true, $mail->getPart(1) instanceof \Nettools\Mailing\MailBuilder\Embedding);
-		$this->assertStringContainsString("Content-Disposition: inline;\r\n filename=\"cid1\"", $mail->getContent());
-		$this->assertStringContainsString(base64_encode('{content of file}'), $mail->getContent());
-	}
-	
-	
 
 	public function testEmbeddings()
 	{
 		// using template
-		$e = new Engine('To be processed', 'text/plain', [
-															'embeddings' => [	Engine::embedding('{content1 of file}', 'text/plain', 'cid1')->asRawContent(),
-																			   	Engine::embedding('{content2 of file}', 'text/plain', 'cid2')->asRawContent() ]
-														 ]);
+		$e = (new Engine())->template()
+					->text('To be processed')
+					->noAlternativePart()
+					->embedSome([
+									Engine::embedding('{content1 of file}', 'text/plain', 'cid1')->asRawContent(),
+									Engine::embedding('{content2 of file}', 'text/plain', 'cid2')->asRawContent()
+								]);
+
 		$mail = $e->build();
 		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
 		$this->assertEquals(true, $mail->getPart(1) instanceof \Nettools\Mailing\MailBuilder\Embedding);
@@ -95,37 +74,22 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	}
 	
 	
-
-	public function testReady()
+	
+	public function testPreProcessor()
 	{
-		function __ready($e)
-		{
-			try
-			{
-				$e->ready();
-				return true;
-			}
-			catch( \Nettools\MassMailing\TemplateEngine\Exception $e )
-			{
-				return false;
-			}
-		}
-		
-		$e = new Engine(NULL, NULL, NULL, NULL);		
-		$this->assertEquals(false, __ready($e));	// no parameter
-		
-		$e = new Engine('content', 'text/plain');
-		$this->assertEquals(true, __ready($e));		// all parameters
-		
-		$e = new Engine(NULL, 'text/plain');
-		$this->assertEquals(false, __ready($e));	// all except content
-		
-		$e = new Engine('content', NULL);
-		$this->assertEquals(false, __ready($e));	// all except contenttype
-		
-		$e = new Engine('content', 'text/plain', [ 'template' => NULL ]);
-		$this->assertEquals(false, __ready($e));	// empty template
+		$e = (new Engine())->template()
+					->text('To be processed')
+					->noAlternativePart()
+					->preProcessor(new Processor1())
+					->preProcessors([new PreProcessor_SearchReplace()])
+					->withData([ '%placeholder%' => 'here_is_the_value' ]);
+
+		$mail = $e->build();
+		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\Multipart);
+		$this->assertStringContainsString('<p>To be processed : [here_is_the_value]</p>', $mail->getContent());
 	}
+	
+
 }
 
 ?>
