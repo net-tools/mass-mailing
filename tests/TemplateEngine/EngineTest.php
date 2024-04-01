@@ -45,6 +45,20 @@ class EngineTest extends \PHPUnit\Framework\TestCase
 	
 	
 
+	public function testWhen()
+	{
+		// using when
+		$e = (new Engine())->template()
+								->text('Ignored')
+								->noAlternatePart()
+								->when(true, function($t){ $t->text('To be processed'); });
+		$mail = $e->build();
+		$this->assertEquals(true, $mail instanceof \Nettools\Mailing\MailBuilder\TextPlainContent);
+		$this->assertStringContainsString('To be processed', $mail->getContent());
+	}
+	
+	
+
 	public function testAttachments()
 	{
 		// using template

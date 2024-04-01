@@ -21,7 +21,9 @@ class Mailing
 {
 	protected $_from = NULL;
 	protected $_subject = NULL;
-	protected $_replyTo = false;
+	protected $_replyTo = NULL;
+	protected $_bccTo = NULL;
+	protected $_ccTo = NULL;
 	protected $_userDefinedHeaders = [];
 	
 	protected $_queue = NULL;
@@ -56,7 +58,7 @@ class Mailing
 	 * Send emails to queue subsystem defined with fluent design
 	 *
 	 * @param Queue $queue Queue definition object
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	 function toQueue(Queue $queue)
 	 {
@@ -70,7 +72,7 @@ class Mailing
 	 * Set test recipients
 	 *
 	 * @param string[] $testRecipients
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	 function toTestRecipients(array $testRecipients)
 	 {
@@ -84,7 +86,7 @@ class Mailing
 	 * Fluent function to set From value
 	 *
 	 * @param string $from
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	function from($from)
 	{
@@ -98,7 +100,7 @@ class Mailing
 	 * Fluent function to set Subject value
 	 *
 	 * @param string $about
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	function about($subject)
 	{
@@ -112,7 +114,7 @@ class Mailing
 	 * Fluent function to set ReplyTo value
 	 *
 	 * @param string $rto
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	function replyTo($rto)
 	{
@@ -123,11 +125,57 @@ class Mailing
 	
 	
 	/** 
+	 * Fluent function to set Bcc value
+	 *
+	 * @param string $bcc
+	 * @return Mailing Returns $this for chaining calls
+	 */
+	function bccTo($bcc)
+	{
+		$this->_bccTo = $bcc;
+		return $this;
+	}
+	
+	
+	
+	/** 
+	 * Fluent function to set Cc value
+	 *
+	 * @param string $cc
+	 * @return Mailing Returns $this for chaining calls
+	 */
+	function ccTo($cc)
+	{
+		$this->_ccTo = $cc;
+		return $this;
+	}
+	
+	
+	
+	/**
+	 * Conditionnal statement
+	 *
+	 * @param bool $cond Bool value to test ; if `$cond` = True, the action callback is called, otherwise it's ignored
+	 * @param function $callback Function called as callback if `$cond` equals True, with `$this` as parameter so that calls can be chained
+	 * @return Mailing Return $this for chaining calls
+	 */
+	function when($cond, $callback)
+	{
+		if ( $cond )
+			// call user function
+			call_user_func($callback, $this, $this->_engine);
+		
+		return $this;
+	}
+	
+	
+	
+	/** 
 	 * Fluent function to add a user defined header
 	 *
 	 * @param string $name
 	 * @param string $value
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	function header($name, $value)
 	{
@@ -141,7 +189,7 @@ class Mailing
 	 * Fluent function to set UserDefinedHeaders value
 	 *
 	 * @param string $headers Associative array of headers ; key is header name, value is header value ; previous value of _userDefinedHeaders is lost
-	 * @return Engine Returns $this for chaining calls
+	 * @return Mailing Returns $this for chaining calls
 	 */
 	function withHeaders(array $headers)
 	{
@@ -160,6 +208,10 @@ class Mailing
 	{
 		if ( $this->_replyTo )
 			$mail->headers->replyTo = $this->_replyTo;
+		if ( $this->_bccTo )
+			$mail->headers->Bcc = $this->_bccTo;
+		if ( $this->_ccTo )
+			$mail->headers->Cc = $this->_ccTo;
 		
 		foreach ( $this->_userDefinedHeaders as $k => $h )
 			$mail->headers->set($k, $h);
