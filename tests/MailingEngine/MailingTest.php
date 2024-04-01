@@ -59,6 +59,30 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 	
 	
 	
+	public function testWhen()
+	{
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
+
+		// create mail from template system
+		$mail = (new Engine())->template()->text('dummy content')->noAlternatePart()->build();
+		
+		// send mail
+		$m = (new MailingEngine($ml))
+				->mailing([ 'from' => 'unit-test@php.com' ])
+					->about('ignored')
+					->when(true, function($m) { $m->about('test subject'); } )
+					->send($mail, 'recipient@domain.at');
+
+		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
+		$this->assertCount(1, $sent);	
+		$this->assertStringContainsString('From: unit-test@php.com', $sent[0]);
+		$this->assertStringContainsString('Subject: test subject', $sent[0]);
+		$this->assertStringContainsString('To: recipient@domain.at', $sent[0]);
+		$this->assertStringContainsString('Delivered-To: recipient@domain.at', $sent[0]);
+	}
+	
+	
+	
 	public function testModeTest()
 	{
 		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
