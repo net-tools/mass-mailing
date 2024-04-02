@@ -263,11 +263,23 @@ class Mailing
 	 * and apply any headers required
 	 *
 	 * @param \Nettools\Mailing\MailBuilder\Content $mail 
-	 * @param string $to Recipient
+	 * @param string $to Recipients separated by `,`
 	 * @param string $overrideSubject If a custom subject is used for sending mail (makes it possible to have a user-defined value for each mail sent, such as user name)
+	 * @throws \Nettools\MassMailing\MailingEngine\Exception
 	 */
 	function send(Content $mail, $to, $overrideSubject = NULL)
 	{
+		// checking mandatory values
+		if ( !$this->_from )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Mass-mailing `From` value missing");
+		
+		if ( !$to )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Mass-mailing `To` value missing");
+		
+		if ( !$overrideSubject && !$this->_subject )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Mass-mailing `Subject` value missing");
+
+		
 		// set appropriate headers (except From, Subject, and To)
 		$this->prepareHeaders($mail);
 		

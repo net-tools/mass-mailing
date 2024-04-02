@@ -35,9 +35,9 @@ class Template extends Content
 			
 		return $txt;	
 	}
-
-
-		
+	
+	
+	
 	/**
 	 * Define(add) a new preprocessor
 	 *
@@ -87,7 +87,7 @@ class Template extends Content
 	 *
 	 * @return string
 	 */
-	function updateContentString()
+	function returnProcessedContentString()
 	{
 		return $this->_preProcess();
 	}
@@ -98,7 +98,6 @@ class Template extends Content
 	 * Build the email with any customization required, thanks to preprocessors objects array 
 	 *
 	 * @return \Nettools\Mailing\MailBuilder\Content Return the email built
-	 * @throws \Nettools\MassMailing\MailingEngine\Exception
 	 */
 	public function build()
 	{
@@ -113,7 +112,6 @@ class Template extends Content
 	 *
 	 * @param mixed $data Data that may be required during rendering process
 	 * @return \Nettools\Mailing\MailBuilder\Content Return the email built
-	 * @throws \Nettools\MassMailing\MailingEngine\Exception
 	 */
 	public function buildWithData($data)
 	{

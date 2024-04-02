@@ -59,6 +59,71 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 	
 	
 	
+	public function testReady1()
+	{
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
+
+		// create mail from template system
+		$mail = (new Engine())->template()->text('dummy content')->noAlternatePart()->build();
+		
+		// send will fail because From is missing
+		$this->expectException(\Nettools\MassMailing\MailingEngine\Exception::class);
+		$m = (new MailingEngine($ml))
+				->mailing([ /*'from' => 'unit-test@php.com'*/ ])
+					->header('X-Reference', 'header value')
+					->about('test subject')
+					->send($mail, 'recipient@domain.at');
+	}
+	
+	
+	
+	public function testReady2()
+	{
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
+
+		// create mail from template system
+		$mail = (new Engine())->template()->text('dummy content')->noAlternatePart()->build();
+		
+		
+		// send will succeed because Subject is set in send arg
+		$m = (new MailingEngine($ml))
+				->mailing([ 'from' => 'unit-test@php.com' ])
+					->header('X-Reference', 'header value')
+					/*->about('test subject')*/
+					->send($mail, 'recipient@domain.at', 'new subject');
+		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
+		$this->assertStringContainsString('Subject: new subject', $sent[0]);
+
+		
+		// send will fail because Subject is missing
+		$this->expectException(\Nettools\MassMailing\MailingEngine\Exception::class);
+		$m = (new MailingEngine($ml))
+				->mailing([ 'from' => 'unit-test@php.com' ])
+					->header('X-Reference', 'header value')
+					/*->about('test subject')*/
+					->send($mail, 'recipient@domain.at');
+	}
+	
+	
+	
+	public function testReady3()
+	{
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
+
+		// create mail from template system
+		$mail = (new Engine())->template()->text('dummy content')->noAlternatePart()->build();
+		
+		// send will fail because To is missing
+		$this->expectException(\Nettools\MassMailing\MailingEngine\Exception::class);
+		$m = (new MailingEngine($ml))
+				->mailing([ 'from' => 'unit-test@php.com' ])
+					->header('X-Reference', 'header value')
+					->about('test subject')
+					->send($mail, /*'recipient@domain.at'*/'');
+	}
+	
+	
+	
 	public function testWhen()
 	{
 		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
