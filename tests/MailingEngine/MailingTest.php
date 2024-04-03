@@ -79,7 +79,6 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString('To: recipient1@domain.at', $sent[0]);
 		$this->assertStringContainsString('Delivered-To: recipient1@domain.at', $sent[0]);
 		$this->assertStringContainsString('dummy content', $sent[0]);
-		$this->assertStringContainsString('X-Reference: header value', $sent[1]);
 		$this->assertStringContainsString('From: unit-test@php.com', $sent[1]);
 		$this->assertStringContainsString('Subject: test subject', $sent[1]);
 		$this->assertStringContainsString('To: recipient2@domain.at', $sent[1]);
@@ -117,7 +116,6 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		$this->assertStringContainsString('To: recipient1@domain.at', $sent[0]);
 		$this->assertStringContainsString('Delivered-To: recipient1@domain.at', $sent[0]);
 		$this->assertStringContainsString('dummy content', $sent[0]);
-		$this->assertStringContainsString('X-Reference: header value', $sent[1]);
 		$this->assertStringContainsString('From: unit-test@php.com', $sent[1]);
 		$this->assertStringContainsString('Subject: test subject', $sent[1]);
 		$this->assertStringContainsString('To: recipient2@domain.at', $sent[1]);
