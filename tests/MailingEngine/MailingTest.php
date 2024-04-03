@@ -61,6 +61,12 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 	
 	public function testMailingBatch()
 	{
+		// raz store
+		$msq = Store::read($this->_queuePath, true);
+		$msq->clear();
+		
+		
+		
 		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
 
 		// create mail from template system
@@ -103,13 +109,22 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		
 		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
 		$this->assertCount(0, $sent);	// no mail sent, as we use a queue
+		$m->done(); 	// commit queue to storage
+		
 
-		// commit queue to storage
-		$m->done();
+		// testing queue content
+		$queues = $msq->getList(Store::SORT_DATE);
+		$this->assertCount(1, $queues);
+		$key = key($queues);
+		$q = current($queues);
+		$this->assertEquals(2, $q->count);
+		$this->assertEquals(false, $q->locked);
+		$this->assertEquals(0, $q->sendOffset);		// no mail sent from queue, yet
 		
-		// sending queue
+		// send mzild through queue
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
 		$q->send($ml);
-		
+
 		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
 		$this->assertCount(2, $sent);				// 2 emails from queue sent
 		$this->assertStringContainsString('From: unit-test@php.com', $sent[0]);
@@ -245,6 +260,11 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 	
 	public function testQueue()
 	{
+		// raz store
+		$msq = Store::read($this->_queuePath, true);
+		$msq->clear();
+		
+		
 		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
 
 		// create mail from template system
@@ -269,7 +289,6 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		
 		
 		// testing queue content
-		$msq = Store::read($this->_queuePath, true);
 		$queues = $msq->getList(Store::SORT_DATE);
 		$this->assertCount(1, $queues);
 		$key = key($queues);
