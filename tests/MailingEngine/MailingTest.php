@@ -101,6 +101,7 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 					->batchSend($mail, array('recipient1@domain.at', 'recipient2@domain.at'));
 
 		
+		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
 		$this->assertCount(0, $sent);	// no mail sent, as we use a queue
 
 		// commit queue to storage

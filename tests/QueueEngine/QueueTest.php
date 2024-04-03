@@ -176,7 +176,7 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 
 		$mail = Builder::createText('mail content here');
 		$mail->headers->from = 'sender@home.com';
-		$q->pushAsString($mail->getContent(), 'recipient@here.com', 'Subject here');
+		$q->pushAsString($mail->getContent(), $mail->getAllHeaders()->toString(), 'recipient@here.com', 'Subject here');
 		
 		$this->assertEquals(1, $q->count);
 		$this->assertEquals(strlen('mail content here'), $q->volume);
