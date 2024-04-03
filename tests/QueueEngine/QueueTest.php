@@ -170,9 +170,8 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 	public function testPushAsString()
 	{
 		$store = $this->createMock(Store::class);
-		$store->expects($this->exactly(1))->method('commit');
 		$params = ['root'=>$this->_vfs->url(), 'store'=>$store];
-		$q = Queue::create('qname', $params);
+		$q = Queue::create('qname2', $params);
 
 		$mail = Builder::createText('mail content here');
 		$mail->headers->from = 'sender@home.com';

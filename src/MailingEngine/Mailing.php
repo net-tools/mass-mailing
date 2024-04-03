@@ -271,6 +271,7 @@ class Mailing
 	 * @param \Nettools\Mailing\MailBuilder\Content $mail 
 	 * @param string $to Recipients separated by `,`
 	 * @param string $overrideSubject If a custom subject is used for sending mail (makes it possible to have a user-defined value for each mail sent, such as user name)
+	 * @return Mailing Returns $this for chaining calls
 	 * @throws \Nettools\MassMailing\MailingEngine\Exception
 	 */
 	function send(Content $mail, $to, $overrideSubject = NULL)
@@ -299,7 +300,7 @@ class Mailing
 
 			// if no more test email ($to = NULL), exiting as we only simulate
 			if ( !$to )
-				return; 
+				return $this; 
 		}		
 		
 
@@ -308,6 +309,9 @@ class Mailing
 			$this->_queueObj->push($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject); 
 		else
 			$this->_engine->getMailer()->sendmail($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject);
+		
+		
+		return $this;
 	}
 	
 	
@@ -319,6 +323,7 @@ class Mailing
 	 *
 	 * @param \Nettools\Mailing\MailBuilder\Content $mail 
 	 * @param string[] $to Array of recipients
+	 * @return Mailing Returns $this for chaining calls
 	 * @throws \Nettools\MassMailing\MailingEngine\Exception
 	 */
 	function batchSend(Content $mail, array $to)
@@ -354,6 +359,9 @@ class Mailing
 				$this->_queueObj->pushAsString($m, $hs, $recipient, $this->_subject); 
 			else
 				$this->_engine->getMailer()->sendmail_raw($recipient, $this->_subject, $m, $h);
+		
+		
+		return $this;
 	}
 }
 
