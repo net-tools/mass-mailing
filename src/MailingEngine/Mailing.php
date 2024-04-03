@@ -351,7 +351,7 @@ class Mailing
 		// sending mail
 		foreach ( $to as $recipient )
 			if ( $this->createQueue() )
-				$this->_queueObj->pushAsString($mail, $hs, $recipient, $this->_subject); 
+				$this->_queueObj->pushAsString($m, $hs, $recipient, $this->_subject); 
 			else
 				$this->_engine->getMailer()->sendmail_raw($recipient, $this->_subject, $m, $h);
 	}
