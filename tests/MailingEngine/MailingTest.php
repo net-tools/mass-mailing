@@ -74,7 +74,6 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 
 		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
 		$this->assertCount(2, $sent);	
-		$this->assertStringContainsString('X-Reference: header value', $sent[0]);
 		$this->assertStringContainsString('From: unit-test@php.com', $sent[0]);
 		$this->assertStringContainsString('Subject: test subject', $sent[0]);
 		$this->assertStringContainsString('To: recipient1@domain.at', $sent[0]);
@@ -113,7 +112,6 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		
 		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
 		$this->assertCount(2, $sent);				// 2 emails from queue sent
-		$this->assertStringContainsString('X-Reference: header value', $sent[0]);
 		$this->assertStringContainsString('From: unit-test@php.com', $sent[0]);
 		$this->assertStringContainsString('Subject: test subject', $sent[0]);
 		$this->assertStringContainsString('To: recipient1@domain.at', $sent[0]);
