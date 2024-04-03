@@ -344,7 +344,7 @@ class Mailing
 		
 		// convert mail to string and get headers
 		$m = $mail->getContent();
-		$h = $mail->getAllHeaders()->set('From', $from);
+		$h = $mail->getAllHeaders()->set('From', $this->_from);
 		$hs = $h->toString();
 		
 
