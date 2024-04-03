@@ -167,6 +167,23 @@ class QueueTest extends \PHPUnit\Framework\TestCase
 	
 	
 	
+	public function testPushAsString()
+	{
+		$store = $this->createMock(Store::class);
+		$store->expects($this->exactly(1))->method('commit');
+		$params = ['root'=>$this->_vfs->url(), 'store'=>$store];
+		$q = Queue::create('qname', $params);
+
+		$mail = Builder::createText('mail content here');
+		$mail->headers->from = 'sender@home.com';
+		$q->pushAsString($mail->getContent(), 'recipient@here.com', 'Subject here');
+		
+		$this->assertEquals(1, $q->count);
+		$this->assertEquals(strlen('mail content here'), $q->volume);
+	}
+	
+		
+			
 	public function testSend()
 	{
 		$store = $this->createMock(Store::class);

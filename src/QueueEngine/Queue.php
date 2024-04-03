@@ -353,6 +353,30 @@ class Queue {
 	
 	
 	
+	/**
+     * Push an email string to the queue
+     * 
+     * @param string $mail Email as string
+     * @param string $headers Headers as string (must already include `From` header)
+     * @param string $to Email recipient
+     * @param string $subject Email subject
+     */
+	function pushAsString($mail, $headers, $to, $subject)
+	{
+		// adding to queue
+		$this->_push(
+						$mail, 
+						(object)[ 
+							'to'		=> $to, 
+							'subject'	=> $subject,
+							'status'	=> Data::STATUS_TOSEND,
+							'headers'	=> $headers
+						]
+					);
+	}
+	
+	
+	
 	/** 
      * Send a batch of email through a Mailer instance, and optionnally add headers
      *

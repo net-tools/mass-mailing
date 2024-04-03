@@ -59,6 +59,76 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 	
 	
 	
+	public function testMailingBatch()
+	{
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
+
+		// create mail from template system
+		$mail = (new Engine())->template()->text('dummy content')->noAlternatePart()->build();
+		
+		// send mail
+		$m = (new MailingEngine($ml))
+				->mailing([ 'from' => 'unit-test@php.com' ])
+					->about('test subject')
+					->batchSend($mail, array('recipient1@domain.at', 'recipient2@domain.at'));
+
+		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
+		$this->assertCount(2, $sent);	
+		$this->assertStringContainsString('X-Reference: header value', $sent[0]);
+		$this->assertStringContainsString('From: unit-test@php.com', $sent[0]);
+		$this->assertStringContainsString('Subject: test subject', $sent[0]);
+		$this->assertStringContainsString('To: recipient1@domain.at', $sent[0]);
+		$this->assertStringContainsString('Delivered-To: recipient1@domain.at', $sent[0]);
+		$this->assertStringContainsString('dummy content', $sent[0]);
+		$this->assertStringContainsString('X-Reference: header value', $sent[1]);
+		$this->assertStringContainsString('From: unit-test@php.com', $sent[1]);
+		$this->assertStringContainsString('Subject: test subject', $sent[1]);
+		$this->assertStringContainsString('To: recipient2@domain.at', $sent[1]);
+		$this->assertStringContainsString('Delivered-To: recipient2@domain.at', $sent[1]);
+		$this->assertStringContainsString('dummy content', $sent[1]);
+		
+		
+		
+		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());
+
+		// create mail from template system
+		$mail = (new Engine())->template()->text('dummy content')->noAlternatePart()->build();
+		
+		// send mail
+		$m = (new MailingEngine($ml))
+				->mailing([ 'from' => 'unit-test@php.com' ])
+					->about('test subject')
+					->toQueue(MailingEngine::queue('qname', $this->_queuePath)
+							  		->batchCount(10))
+					->batchSend($mail, array('recipient1@domain.at', 'recipient2@domain.at'));
+
+		
+		$this->assertCount(0, $sent);	// no mail sent, as we use a queue
+
+		// commit queue to storage
+		$m->done();
+		
+		// sending queue
+		$q->send($ml);
+		
+		$sent = $ml->getMailerEngine()->getMailSender()->getSent();
+		$this->assertCount(2, $sent);				// 2 emails from queue sent
+		$this->assertStringContainsString('X-Reference: header value', $sent[0]);
+		$this->assertStringContainsString('From: unit-test@php.com', $sent[0]);
+		$this->assertStringContainsString('Subject: test subject', $sent[0]);
+		$this->assertStringContainsString('To: recipient1@domain.at', $sent[0]);
+		$this->assertStringContainsString('Delivered-To: recipient1@domain.at', $sent[0]);
+		$this->assertStringContainsString('dummy content', $sent[0]);
+		$this->assertStringContainsString('X-Reference: header value', $sent[1]);
+		$this->assertStringContainsString('From: unit-test@php.com', $sent[1]);
+		$this->assertStringContainsString('Subject: test subject', $sent[1]);
+		$this->assertStringContainsString('To: recipient2@domain.at', $sent[1]);
+		$this->assertStringContainsString('Delivered-To: recipient2@domain.at', $sent[1]);
+		$this->assertStringContainsString('dummy content', $sent[1]);
+	}
+	
+	
+	
 	public function testReady1()
 	{
 		$ml = new Mailer(new \Nettools\Mailing\MailSenders\Virtual());

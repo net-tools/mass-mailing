@@ -259,8 +259,14 @@ class Mailing
 	
 	
 	/** 
-	 * Send an email already created with TemplateEngine or any other way, provided it's a Nettools\Mailing\MailBuilder\Content object
+	 * Send an email to some recipients already created with TemplateEngine or any other way, provided it's a Nettools\Mailing\MailBuilder\Content object
 	 * and apply any headers required
+	 *
+	 * This function is suitable to send a customized email to one or more recipients (generally one, but twice or more can be set as recipients ; however, they
+	 * will all appear in `To` header). 
+	 *
+	 * For each call to `send`, the `$mail` object is converted to a string. So, if a same email must be sent to a lot of recipients, one recipient at a time (so that 
+	 * all recipients don't appear in `To` header), the sendBatch function is prefered.
 	 *
 	 * @param \Nettools\Mailing\MailBuilder\Content $mail 
 	 * @param string $to Recipients separated by `,`
@@ -302,6 +308,52 @@ class Mailing
 			$this->_queueObj->push($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject); 
 		else
 			$this->_engine->getMailer()->sendmail($mail, $this->_from, $to, $overrideSubject ? $overrideSubject : $this->_subject);
+	}
+	
+	
+	
+	/** 
+	 * Send a defined email to a lot of recipients
+	 *
+	 * Each email is sent to a single recipient and optimizations are done to prevent uneccesary stuff
+	 *
+	 * @param \Nettools\Mailing\MailBuilder\Content $mail 
+	 * @param string[] $to Array of recipients
+	 * @throws \Nettools\MassMailing\MailingEngine\Exception
+	 */
+	function batchSend(Content $mail, array $to)
+	{
+		// checking mandatory values
+		if ( !$this->_from )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Mass-mailing `From` value missing");
+		
+		if ( !count($to) )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Mass-mailing `To` value missing");
+
+		if ( !$this->_subject )
+			throw new \Nettools\MassMailing\MailingEngine\Exception("Mass-mailing `Subject` value missing");
+		
+		// set appropriate headers (except From, Subject, and To)
+		$this->prepareHeaders($mail);
+		
+		
+		// test mode enabled ? if so, use array of test recipients
+		if ( count($this->_testRecipients) )
+			$to = $this->_testRecipients;
+		
+		
+		// convert mail to string and get headers
+		$m = $mail->getContent();
+		$h = $mail->getAllHeaders()->set('From', $from);
+		$hs = $h->toString();
+		
+
+		// sending mail
+		foreach ( $to as $recipient )
+			if ( $this->createQueue() )
+				$this->_queueObj->pushAsString($mail, $hs, $recipient, $this->_subject); 
+			else
+				$this->_engine->getMailer()->sendmail_raw($recipient, $this->_subject, $m, $h);
 	}
 }
 
