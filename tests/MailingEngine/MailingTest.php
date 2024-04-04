@@ -113,6 +113,7 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		
 
 		// testing queue content
+		$msq = Store::read($this->_queuePath, false);
 		$queues = $msq->getList(Store::SORT_DATE);
 		$this->assertCount(1, $queues);
 		$key = key($queues);
@@ -289,6 +290,7 @@ class MailingTest extends \PHPUnit\Framework\TestCase
 		
 		
 		// testing queue content
+		$msq = Store::read($this->_queuePath, false);
 		$queues = $msq->getList(Store::SORT_DATE);
 		$this->assertCount(1, $queues);
 		$key = key($queues);
